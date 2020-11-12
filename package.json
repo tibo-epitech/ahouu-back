@@ -1,0 +1,31 @@
+{
+  "name": "ahouu-back",
+  "version": "1.0.0",
+  "description": "server for werewolf game",
+  "main": "index.js",
+  "scripts": {
+    "start-dev": "SET NODE_ENV=dev&& node app.js",
+    "start-prod": "SET NODE_ENV=prod&& node app.js",
+    "lint": "eslint src/* app.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tibo-epitech/ahouu-back.git"
+  },
+  "author": "tibo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tibo-epitech/ahouu-back/issues"
+  },
+  "homepage": "https://github.com/tibo-epitech/ahouu-back#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
+}
