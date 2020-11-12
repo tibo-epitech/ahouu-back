@@ -4,10 +4,11 @@
   "description": "server for werewolf game",
   "main": "index.js",
   "scripts": {
+    "start-test": "SET NODE_ENV=test&& node app.js",
     "start-dev": "SET NODE_ENV=dev&& node app.js",
     "start-prod": "SET NODE_ENV=prod&& node app.js",
     "lint": "eslint src/* app.js",
-    "test": "test"
+    "test": "npm run lint && npm run start-test"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,13 @@
   "devDependencies": {
     "eslint": "^7.2.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1"
+    "eslint-plugin-import": "^2.22.1",
+    "husky": "^4.3.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test",
+      "pre-push": "npm run lint"
+    }
   }
 }

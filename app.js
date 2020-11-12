@@ -12,3 +12,10 @@ app.use('/', router);
 app.listen(port, () => {
     console.log(`server listen on: ${host}${port}`);
 });
+
+if (`${process.env.NODE_ENV}` === 'test') {
+    setTimeout(() => {
+        console.error('Test is Ok');
+        process.exit(0);
+    }, 3000);
+}
