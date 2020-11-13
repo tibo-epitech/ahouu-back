@@ -1,4 +1,5 @@
 import express from 'express';
+import db from './dbWorker';
 import strings_ = require('../config/strings.json');
 
 const router = express.Router();

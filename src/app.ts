@@ -1,6 +1,5 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import db from './dbWorker';
 import router from './router';
 
 dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}/` });
