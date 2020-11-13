@@ -25,7 +25,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv = __importStar(require("dotenv"));
 var router_1 = __importDefault(require("./router"));
-dotenv.config({ path: "./.env." + process.env.NODE_ENV + "/" });
+dotenv.config({ path: "./config/.env." + process.env.NODE_ENV + "/" });
 var app = express_1.default();
 var port = process.env.PORT;
 var host = process.env.HOST;

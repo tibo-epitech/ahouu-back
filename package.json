@@ -23,6 +23,8 @@
   "homepage": "https://github.com/tibo-epitech/ahouu-back#readme",
   "dependencies": {
     "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.9",
+    "@types/node": "^14.14.7",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
   },
