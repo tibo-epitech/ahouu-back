@@ -3,17 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var strings_ = require("./strings.json");
-var router = express_1.default.Router();
-var strings = JSON.parse(JSON.stringify(strings_));
-router.get('/', function (req, res) {
+const express_1 = __importDefault(require("express"));
+const strings_ = require("../config/strings.json");
+const router = express_1.default.Router();
+const strings = JSON.parse(JSON.stringify(strings_));
+router.get('/', (req, res) => {
     res.send('Hello World');
 });
-router.get('*/:lang?', function (req, res) {
+router.get('*/:lang?', (req, res) => {
     res.status(404);
     if (req.query.lang !== undefined) {
-        var lang = req.query.lang.toString();
+        const lang = req.query.lang.toString();
         res.send(strings[lang].routeDown);
     }
     else {

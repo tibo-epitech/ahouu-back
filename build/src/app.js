@@ -22,19 +22,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var dotenv = __importStar(require("dotenv"));
-var router_1 = __importDefault(require("./router"));
-dotenv.config({ path: "./config/.env." + process.env.NODE_ENV + "/" });
-var app = express_1.default();
-var port = process.env.PORT;
-var host = process.env.HOST;
+const express_1 = __importDefault(require("express"));
+const dotenv = __importStar(require("dotenv"));
+const router_1 = __importDefault(require("./router"));
+dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}/` });
+const app = express_1.default();
+const port = process.env.PORT;
+const host = process.env.HOST;
 app.use('/', router_1.default);
-app.listen(port, function () {
-    console.log("server listen on: " + host + port); // eslint-disable-line
+app.listen(port, () => {
+    console.log(`server listen on: ${host}${port}`); // eslint-disable-line
 });
-if ("" + process.env.NODE_ENV === 'test') {
-    setTimeout(function () {
+if (`${process.env.NODE_ENV}` === 'test') {
+    setTimeout(() => {
         console.error('Test OK'); // eslint-disable-line
         process.exit(0);
     }, 3000);

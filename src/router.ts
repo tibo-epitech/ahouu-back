@@ -1,5 +1,5 @@
 import express from 'express';
-import strings_ = require('./strings.json');
+import strings_ = require('../config/strings.json');
 
 const router = express.Router();
 const strings = JSON.parse(JSON.stringify(strings_));
