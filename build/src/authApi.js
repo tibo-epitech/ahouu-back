@@ -44,6 +44,10 @@ authApi.register = async (req, res) => {
     if (req.body.username !== undefined) {
         user.username = req.body.username;
     }
+    else {
+        const first = user.email.split('@')[0];
+        user.username = first;
+    }
     await dbWorker_1.default.users.doc(userID).set(user);
     res.json({
         success: true,

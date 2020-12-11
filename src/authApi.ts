@@ -41,6 +41,9 @@ authApi.register = async (req : Request, res : Response) => {
     user.password = cryptoJS.MD5(req.body.password).toString();
     if (req.body.username !== undefined) {
         user.username = req.body.username;
+    } else {
+        const first = user.email.split('@')[0];
+        user.username = first;
     }
     await fbworker.users.doc(userID).set(user);
     res.json({
