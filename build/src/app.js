@@ -26,7 +26,7 @@ const express_1 = __importDefault(require("express"));
 const dotenv = __importStar(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const router_1 = __importDefault(require("./router"));
-dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}/` });
+dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}` });
 const app = express_1.default();
 const port = process.env.PORT;
 const host = process.env.HOST;
