@@ -4,7 +4,7 @@
   "description": "server for werewolf game",
   "main": "index.js",
   "scripts": {
-    "prestart": "cross-env NODE_ENV=prod npm run build",
+    "dev:prestart": "cross-env NODE_ENV=prod npm run build",
     "start": "cross-env NODE_ENV=prod node build/src/app.js",
     "dev": "nodemon --exec \"cross-env NODE_ENV=dev ts-node src/app.ts\" --watch src/ -e ts",
     "build": "npx tsc",
