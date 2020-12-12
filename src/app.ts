@@ -1,5 +1,6 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import router from './router';
 
@@ -9,6 +10,7 @@ const app = express();
 const port = process.env.PORT;
 const host = process.env.HOST;
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', router);
