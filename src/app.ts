@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -14,6 +14,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', router);
+
+app.use((err: any, req: Request, res: Response, next: any) => { // eslint-disable-line
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).send({
+            success: false,
+            message: 'invalid token',
+        });
+    }
+});
 
 app.listen(port, () => {
     console.log(`server listen on: ${host}${port}`); // eslint-disable-line

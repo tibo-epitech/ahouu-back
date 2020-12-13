@@ -1,5 +1,6 @@
 import express from 'express';
 import authApi from './authApi';
+import authorization from './authorization';
 import strings_ = require('../config/strings.json');
 
 const router = express.Router();
@@ -23,12 +24,15 @@ router.get('*/:lang?', (req, res) => {
 
 // Routes POST
 
-router.post('/login', (req, res) => {
-    authApi.login(req, res);
-});
+router.post('/login', authApi.login);
 
-router.post('/register', (req, res) => {
-    authApi.register(req, res);
+router.post('/register', authApi.register);
+
+router.post('/testAuth', authorization, (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'authorized user',
+    });
 });
 
 export default router;
