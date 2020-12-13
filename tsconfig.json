@@ -1,6 +1,6 @@
 {​​​​​​​
-  "compilerOptions": {​​​​​​​
-    "outDir": "build",
+  "compilerOptions": {
+    "outDir": "./build",
     "module": "commonjs",
     "esModuleInterop": true,
     "noImplicitAny": true,
@@ -9,5 +9,7 @@
     "lib": ["es6"],
     "allowJs": true,
     "strict": true,
-  }​​​​​​​
+  }​​​​​​​,
+  "include": ["src", "config"],
+  "exclude": ["migrations", "node_modules", "tests"]
 }​​​​​​​

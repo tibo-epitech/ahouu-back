@@ -35,6 +35,14 @@ app.use(cors_1.default());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use('/', router_1.default);
+app.use((err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).send({
+            success: false,
+            message: 'invalid token',
+        });
+    }
+});
 app.listen(port, () => {
     console.log(`server listen on: ${host}${port}`); // eslint-disable-line
 });

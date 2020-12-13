@@ -27,6 +27,9 @@ router.get('*/:lang?', (req, res) => {
 router.post('/login', authApi_1.default.login);
 router.post('/register', authApi_1.default.register);
 router.post('/testAuth', authorization_1.default, (req, res) => {
-    console.log(req, res);
+    res.status(200).json({
+        success: true,
+        message: 'authorized user',
+    });
 });
 exports.default = router;
