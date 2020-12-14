@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev:prestart": "cross-env NODE_ENV=prod npm run build",
-    "start": "cross-env NODE_ENV=prod node build/src/app.js",
-    "dev": "nodemon --exec \"cross-env NODE_ENV=dev ts-node src/app.ts\" --watch src/ -e ts",
+    "start": "cross-env NODE_ENV=prod node build/src/",
+    "dev": "nodemon --exec \"cross-env NODE_ENV=dev ts-node src/\" --watch src/ -e ts",
     "build": "npx tsc",
     "lint": "eslint src/*",
     "test": "cross-env NODE_ENV=test ts-mocha tests/index.ts"

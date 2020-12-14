@@ -1,13 +1,8 @@
 import express, { Request, Response } from 'express';
-import * as dotenv from 'dotenv';
 import cors from 'cors';
 import router from './router';
 
-dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}` });
-
 const app = express();
-const port = process.env.PORT;
-const host = process.env.HOST;
 
 // @ts-ignore
 app.use(cors());
@@ -27,6 +22,4 @@ app.use((err: any, req: Request, res: Response, next: any) => { // eslint-disabl
     next();
 });
 
-app.listen(port, () => {
-    console.log(`server listen on: ${host}${port}`); // eslint-disable-line
-});
+export default app;
