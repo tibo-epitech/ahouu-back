@@ -17,12 +17,13 @@ function handler(this: { server?: http.Server }, message: string, out: Out) {
 }
 
 const server = app.listen(process.env.PORT || 7070, () => {
-    console.log(`LOGGER SERVER - Listening on: http://localhost:${process.env.PORT || 7070}`);
+    console.log(`🚀 Server ready at: http://localhost:${process.env.PORT || 7070}`);
 });
+
 const logger = handler.bind({ server });
 
 process
-    .on('unhandledRejection', (reason) => logger('Unhandled Rejection:', reason))
+    .on('unhandledRejection', (reason) => logger('Unhandled Rejection', reason))
     .on('uncaughtException', (err) => logger('Uncaught Exception', err))
     .on('SIGINT', (signal) => logger('Received signal', signal))
     .on('SIGTERM', (signal) => logger('Received signal', signal));
