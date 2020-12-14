@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
 import cryptoJS from 'crypto-js';
 import axios, { AxiosRequestConfig } from 'axios';
+import isEmpty from 'lodash.isempty';
+import omit from 'lodash.omit';
 import fbworker from './dbWorker';
+import { User, UserResponse } from './types';
 
 const authApi : {[k: string]: (arg0: Request, arg1: Response) => void} = {};
 
-async function getTokenFromAuth0() {
+async function getTokenFromAuth0(): Promise<string> {
     const options : AxiosRequestConfig = {
         method: 'POST',
         url: 'https://ahouu-back.eu.auth0.com/oauth/token',
@@ -22,103 +25,55 @@ async function getTokenFromAuth0() {
 }
 
 authApi.register = async (req : Request, res : Response) => {
-    if (req.body === undefined) {
-        res.status(400).json({
-            success: false,
-            message: 'body is undefined',
-        });
-        return;
-    }
-    if (req.body.password === undefined || req.body.password === null || req.body.password === '') {
-        res.status(400).json({
-            success: false,
-            message: 'no password was provided',
-        });
-        return;
-    }
-    if (req.body.email === undefined || req.body.email === null || req.body.email === '') {
-        res.status(400).json({
-            success: false,
-            message: 'no email was provided',
-        });
-        return;
-    }
-    const userID = cryptoJS.MD5(req.body.email).toString();
+    if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
+
+    const { email, password, username } = req.body;
+    if (isEmpty(email)) return res.status(400).send({ message: 'auth/invalid-email' });
+    if (isEmpty(password)) return res.status(400).send({ message: 'auth/invalid-password' });
+
+    const userID = cryptoJS.MD5(email).toString();
     const userCall = await fbworker.users.doc(userID).get();
-    if (userCall.exists) {
-        res.status(400).json({
-            success: false,
-            message: 'user already exist',
-        });
-        return;
-    }
-    const user : {[k: string]: string} = {};
-    user.id = userID;
-    user.email = req.body.email;
-    user.password = cryptoJS.MD5(req.body.password).toString();
-    if (req.body.username !== undefined) {
-        user.username = req.body.username;
-    } else {
-        const first = user.email.split('@')[0];
-        user.username = first;
-    }
-    await fbworker.users.doc(userID).set(user);
-    res.status(201).json({
-        success: true,
-        message: 'register successfully',
-        user,
-    });
+
+    const parsed = isEmpty(username) ? email.split('@')[0] : username;
+    const query = await fbworker.users.where('username', '==', parsed).get();
+
+    if (userCall.exists || query.docs.length) return res.status(400).send({ message: 'auth/user-already-in-use' });
+
+    const data: User = {
+        id: userID,
+        email,
+        password: cryptoJS.MD5(password).toString(),
+        username: parsed,
+        rooms: [],
+        token: await getTokenFromAuth0(),
+    };
+    await fbworker.users.doc(userID).set(data);
+
+    const user: UserResponse = omit(data, 'password');
+    return res.status(201).send({ user });
 };
 
 authApi.login = async (req : Request, res : Response) => {
-    if (req.body === undefined) {
-        res.status(400).json({
-            success: false,
-            message: 'body is undefined',
-        });
-        return;
-    }
-    if (req.body.password === undefined || req.body.password === null || req.body.password === '') {
-        res.status(400).json({
-            success: false,
-            message: 'no password was provided',
-        });
-        return;
-    }
-    if (req.body.email === undefined || req.body.email === null || req.body.email === '') {
-        res.status(400).json({
-            success: false,
-            message: 'no email was provided',
-        });
-        return;
-    }
-    const userID = cryptoJS.MD5(req.body.email).toString();
+    if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
+
+    const { email, password } = req.body;
+    if (isEmpty(email)) return res.status(400).send({ message: 'auth/invalid-email' });
+    if (isEmpty(password)) return res.status(400).send({ message: 'auth/invalid-password' });
+
+    const userID = cryptoJS.MD5(email).toString();
     const userCall = await fbworker.users.doc(userID).get();
-    if (!userCall.exists) {
-        res.status(403).json({
-            success: false,
-            message: 'user doesn\'t exist',
-        });
-        return;
-    }
-    const user = userCall.data();
-    const passwordToCompare = cryptoJS.MD5(req.body.password).toString();
-    if (user === undefined || user.password !== passwordToCompare) {
-        res.status(403).json({
-            success: false,
-            message: 'login incorrect',
-        });
-        return;
-    }
-    getTokenFromAuth0().then((accessToken) => {
-        user.token = accessToken;
-        fbworker.users.doc(userID).set(user);
-        res.status(200).json({
-            success: true,
-            message: 'login successfully',
-            user,
-        });
-    });
+    if (!userCall.exists) return res.status(400).send({ message: 'auth/user-not-found' });
+
+    const data = userCall.data() as User;
+    const passwordToCompare = cryptoJS.MD5(password).toString();
+
+    if (data.password !== passwordToCompare) return res.status(400).send({ message: 'auth/invalid-credentials' });
+
+    data.token = await getTokenFromAuth0();
+    await fbworker.users.doc(userID).set(data);
+
+    const user: UserResponse = omit(data, 'password');
+    return res.status(200).send({ user });
 };
 
 export default authApi;

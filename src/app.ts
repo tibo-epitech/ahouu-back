@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import router from './router';
 
 dotenv.config({ path: `./config/.env.${process.env.NODE_ENV}` });
@@ -10,9 +9,10 @@ const app = express();
 const port = process.env.PORT;
 const host = process.env.HOST;
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => { next(); }, cors());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/', router);
 
 app.use((err: any, req: Request, res: Response, next: any) => { // eslint-disable-line
@@ -22,15 +22,10 @@ app.use((err: any, req: Request, res: Response, next: any) => { // eslint-disabl
             message: 'invalid token',
         });
     }
+
+    next();
 });
 
 app.listen(port, () => {
     console.log(`server listen on: ${host}${port}`); // eslint-disable-line
 });
-
-if (`${process.env.NODE_ENV}` === 'test') {
-    setTimeout(() => {
-        console.error('Test OK'); // eslint-disable-line
-        process.exit(0);
-    }, 3000);
-}
