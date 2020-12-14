@@ -9,7 +9,8 @@ const app = express();
 const port = process.env.PORT;
 const host = process.env.HOST;
 
-app.use((req, res, next) => { next(); }, cors());
+// @ts-ignore
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
