@@ -1,15 +1,18 @@
 import adminDb from 'firebase-admin';
-import serviceAccount_ from '../config/ahouu-db-firebase.json';
-
-const serviceAccount = JSON.parse(JSON.stringify(serviceAccount_));
-const fbworker : {[k: string]: FirebaseFirestore.CollectionReference} = {};
+import serviceAccount from '../config/ahouu-db-firebase.json';
+import { Collections } from './types';
 
 adminDb.initializeApp({
-    credential: adminDb.credential.cert(serviceAccount),
-    databaseURL: 'https://ahouu-db.firebaseio.com',
+  credential: adminDb.credential.cert(serviceAccount as adminDb.ServiceAccount),
+  databaseURL: 'https://ahouu-db.firebaseio.com',
+  storageBucket: 'ahouu-db.appspot.com',
 });
 
 const db = adminDb.firestore();
-fbworker.users = db.collection('users');
+const fbworker : Record<Collections, FirebaseFirestore.CollectionReference> = {
+  users: db.collection('users'),
+  rooms: db.collection('rooms'),
+};
 
+export const storage = adminDb.storage().bucket();
 export default fbworker;

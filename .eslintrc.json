@@ -1,39 +1,15 @@
 {
-    "root": true,
-    "env": {
-        "commonjs": true,
-        "es2020": true,
-        "node": true
-    },
-    "plugins": [
-        "@typescript-eslint"
-    ],
-    "parser": "@typescript-eslint/parser",
     "extends": [
-        "airbnb-base",
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
+        "airbnb-typescript/base",
+        "plugin:json/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
     ],
-    "settings": {
-        "import/resolver": {
-          "node": {
-            "extensions": [".js", ".jsx", ".ts", ".tsx"]
-          }
-        }
+    "parserOptions": {
+        "project": "./tsconfig.json"
     },
     "rules": {
         "@typescript-eslint/ban-ts-comment": "off",
-        "indent": ["error", 4],
-        "import/extensions": [
-            "error",
-            "ignorePackages",
-            {
-              "js": "never",
-              "jsx": "never",
-              "ts": "never",
-              "tsx": "never"
-            }
-        ]
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }

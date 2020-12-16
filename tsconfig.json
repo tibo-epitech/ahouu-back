@@ -1,4 +1,4 @@
-{​​​​​​​
+{
   "compilerOptions": {
     "outDir": "./build",
     "module": "commonjs",
@@ -6,10 +6,19 @@
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "target": "es2020",
-    "lib": ["es6"],
+    "lib": [
+      "es6"
+    ],
     "allowJs": true,
-    "strict": true,
-  }​​​​​​​,
-  "include": ["src", "config"],
-  "exclude": ["migrations", "node_modules", "tests"]
-}​​​​​​​
+    "strict": true
+  },
+  "include": [
+    "src",
+    "config"
+  ],
+  "exclude": [
+    "migrations",
+    "node_modules",
+    "tests"
+  ]
+}

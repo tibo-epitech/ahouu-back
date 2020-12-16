@@ -8,4 +8,4 @@ export type User = {
   token: string
 };
 
-export type UserResponse = Omit<User, 'password'>
+export type UserResponse = Omit<User, 'password'>;
