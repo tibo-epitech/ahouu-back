@@ -8,6 +8,7 @@ const router = express.Router();
 const open = (req: Request, res: Response, next: NextFunction) => next();
 
 router.post('/login', open, auth.login);
+router.post('/verify', open, auth.verify);
 router.post('/register', open, auth.register);
 router.post('/users/update', authorization, users.update);
 

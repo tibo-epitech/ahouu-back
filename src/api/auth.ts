@@ -12,6 +12,7 @@ import mime from '../mime';
 import fbworker, { storage } from '../dbWorker';
 import { User, UserResponse } from '../types';
 import { EmailRegEx, PasswordRegEx } from '../utils';
+import authorization from '../authorization';
 
 async function getTokenFromAuth0(): Promise<string> {
   const options : AxiosRequestConfig = {
@@ -116,4 +117,20 @@ export const login = async (
 
   const user: UserResponse = omit(data, 'password');
   return res.status(200).send({ user });
+};
+
+export const verify = async (
+  req: Request,
+  res: Response,
+): Promise<Response<{ valid: boolean }>> => {
+  const valid = await new Promise(
+    (next) => {
+      authorization(req, res, (err: string) => {
+        if (err) return next(false);
+        return next(true);
+      });
+    },
+  );
+
+  return res.status(200).send({ valid });
 };
