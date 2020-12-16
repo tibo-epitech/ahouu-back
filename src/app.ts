@@ -5,7 +5,6 @@ import router from './router';
 
 const app = express();
 
-// @ts-ignore
 app.use(cors());
 app.use(fileUpload({ parseNested: true }));
 

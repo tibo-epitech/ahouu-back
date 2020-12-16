@@ -14,11 +14,11 @@
   },
   "include": [
     "src",
-    "config"
+    "config",
+    "tests"
   ],
   "exclude": [
     "migrations",
     "node_modules",
-    "tests"
   ]
 }

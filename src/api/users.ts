@@ -8,15 +8,15 @@ import { NextFunction, Request, Response } from 'express';
 
 import mime from '../mime';
 import fbworker, { storage } from '../dbWorker';
-import { UserResponse } from '../types';
+import { User, UserResponse } from '../types';
 import { EmailRegEx, getUserFromRequest, PasswordRegEx } from '../utils';
 
 // eslint-disable-next-line import/prefer-default-export
 export const update = async (
-  req : Request,
-  res : Response,
+  req: Request,
+  res: Response,
   next: NextFunction,
-): Promise<Response<any>> => {
+): Promise<Response<{ user: User }>> => {
   const current = await getUserFromRequest(req, next);
   if (!current) return res;
 

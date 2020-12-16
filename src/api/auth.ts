@@ -32,7 +32,10 @@ async function getTokenFromAuth0(): Promise<string> {
   return accessToken.toString();
 }
 
-export const register = async (req : Request, res : Response): Promise<Response<any>> => {
+export const register = async (
+  req: Request,
+  res: Response,
+): Promise<Response<{ user: User }>> => {
   if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
 
   const body = req.body as { email: string, password: string, username: string};
@@ -87,7 +90,10 @@ export const register = async (req : Request, res : Response): Promise<Response<
   return res.status(201).send({ user });
 };
 
-export const login = async (req : Request, res : Response): Promise<Response<any>> => {
+export const login = async (
+  req: Request,
+  res: Response,
+): Promise<Response<{ user: User }>> => {
   if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
 
   const body = req.body as { email: string, password: string };
