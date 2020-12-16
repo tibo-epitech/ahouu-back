@@ -1,4 +1,3 @@
-/* eslint-disable */
 const fbworker = require('../build/src/dbWorker').default;
 console.log('migration - users-collection');
 module.exports.up = () => {
