@@ -1,5 +1,5 @@
 export type Room = {
-  id: string // TODO: unique
+  id: string
   admin: string
   name: string
   max: number // min by default 6
@@ -51,6 +51,9 @@ export enum MessageType {
   WOLF = 'none',
   EVENT = 'event', // TODO: system events -> trad from lang
 }
+
+export type RoomResponse = Omit<Room, 'password'>;
+export type RoomCreateBody = Pick<Room, 'name' | 'max' | 'password'>;
 
 export enum RoomEventsAction {
   JOIN = 'join',

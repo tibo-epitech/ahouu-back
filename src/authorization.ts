@@ -1,7 +1,9 @@
 import jwt from 'express-jwt';
 import jwks from 'jwks-rsa';
+import { NextFunction, Request, Response } from 'express';
 
-export default jwt({
+export const unauthed = (req: Request, res: Response, next: NextFunction): void => next();
+export const authed = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,

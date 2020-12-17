@@ -1,6 +1,5 @@
 import omit from 'lodash.omit';
 import isEmpty from 'lodash.isempty';
-import cryptoJS from 'crypto-js';
 import imagemin from 'imagemin';
 import JpegTran from 'imagemin-jpegtran';
 import PngQuant from 'imagemin-pngquant';
@@ -9,10 +8,15 @@ import { Request, Response } from 'express';
 import axios, { AxiosRequestConfig } from 'axios';
 
 import mime from '../mime';
+import { authed } from '../authorization';
 import fbworker, { storage } from '../dbWorker';
-import { User, UserResponse } from '../types';
-import { EmailRegEx, PasswordRegEx } from '../utils';
-import authorization from '../authorization';
+import { EmailRegEx, Hash, PasswordRegEx } from '../utils';
+import {
+  User,
+  UserRegisterBody,
+  UserResponse,
+  UserSingInBody,
+} from '../types';
 
 async function getTokenFromAuth0(): Promise<string> {
   const options : AxiosRequestConfig = {
@@ -36,16 +40,16 @@ async function getTokenFromAuth0(): Promise<string> {
 export const register = async (
   req: Request,
   res: Response,
-): Promise<Response<{ user: User }>> => {
+): Promise<Response<{ user: UserResponse }>> => {
   if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
 
-  const body = req.body as { email: string, password: string, username: string};
+  const body = req.body as UserRegisterBody;
   const { email, password, username } = body;
 
   if (isEmpty(email) || !EmailRegEx.test(email.trim())) return res.status(400).send({ message: 'auth/invalid-email' });
   if (isEmpty(password) || !PasswordRegEx.test(password)) return res.status(400).send({ message: 'auth/invalid-password' });
 
-  const userID = cryptoJS.MD5(email.trim()).toString();
+  const userID = Hash(email.trim());
   const userCall = await fbworker.users.doc(userID).get();
 
   const parsed = isEmpty(username) ? email.trim().split('@')[0] : username.trim();
@@ -59,7 +63,7 @@ export const register = async (
   const data: User = {
     id: userID,
     email: email.trim(),
-    password: cryptoJS.MD5(password).toString(),
+    password: Hash(password),
     username: parsed,
     rooms: [],
     token: await getTokenFromAuth0(),
@@ -94,26 +98,27 @@ export const register = async (
 export const login = async (
   req: Request,
   res: Response,
-): Promise<Response<{ user: User }>> => {
+): Promise<Response<{ user: UserResponse }>> => {
   if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
 
-  const body = req.body as { email: string, password: string };
+  const body = req.body as UserSingInBody;
   const { email, password } = body;
 
   if (isEmpty(email)) return res.status(400).send({ message: 'auth/invalid-email' });
   if (isEmpty(password)) return res.status(400).send({ message: 'auth/invalid-password' });
 
-  const userID = cryptoJS.MD5(email).toString();
-  const userCall = await fbworker.users.doc(userID).get();
-  if (!userCall.exists) return res.status(400).send({ message: 'auth/user-not-found' });
+  const query = await fbworker.users.where('email', '==', email.trim()).get();
 
-  const data = userCall.data() as User;
-  const passwordToCompare = cryptoJS.MD5(password).toString();
+  if (query.empty) return res.status(400).send({ message: 'auth/user-not-found' });
+
+  const data = query.docs[0].data() as User;
+
+  const passwordToCompare = Hash(password);
 
   if (data.password !== passwordToCompare) return res.status(400).send({ message: 'auth/invalid-credentials' });
 
   data.token = await getTokenFromAuth0();
-  await fbworker.users.doc(userID).set(data);
+  await fbworker.users.doc(data.id).set(data);
 
   const user: UserResponse = omit(data, 'password');
   return res.status(200).send({ user });
@@ -125,7 +130,7 @@ export const verify = async (
 ): Promise<Response<{ valid: boolean }>> => {
   const valid = await new Promise(
     (next) => {
-      authorization(req, res, (err: string) => {
+      authed(req, res, (err: string) => {
         if (err) return next(false);
         return next(true);
       });

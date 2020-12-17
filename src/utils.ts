@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+import cryptoJS from 'crypto-js';
 import { NextFunction, Request } from 'express';
 import { UnauthorizedError } from 'express-jwt';
 
@@ -26,3 +28,6 @@ export const getUserFromRequest = async (
 
   return snap.docs[0].data() as User;
 };
+
+export const GenerateRandomID = (): string => crypto.randomBytes(16).toString('hex');
+export const Hash = (password: string): string => cryptoJS.MD5(password).toString();

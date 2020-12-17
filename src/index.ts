@@ -1,28 +1,18 @@
 /* eslint-disable no-console */
-import http from 'http';
-import app from './app';
-
-type Out = Record<string, unknown> | null | undefined | NodeJS.Signals | Error;
-
-function handler(this: { server?: http.Server }, message: string, out: Out) {
-  try {
-    console.error(`${message}:`, out);
-
-    if (!this.server) process.exit(1);
-    this.server.close(() => process.exit(1));
-  } catch (e) {
-    process.exit(1);
-  }
-}
-
-const server = app.listen(process.env.PORT || 7070, () => {
-  console.log(`🚀 Server ready at: http://localhost:${process.env.PORT || 7070}`);
-});
-
-const logger = handler.bind({ server });
+import server from './server';
 
 process
-  .on('unhandledRejection', (reason) => logger('Unhandled Rejection', reason))
-  .on('uncaughtException', (err) => logger('Uncaught Exception', err))
-  .on('SIGINT', (signal) => logger('Received signal', signal))
-  .on('SIGTERM', (signal) => logger('Received signal', signal));
+  .on('unhandledRejection', (reason) => console.error('Unhandled Rejection:', reason))
+  .on('uncaughtException', (err) => console.error('Uncaught Exception:', err))
+  .on('SIGINT', (signal) => console.log('Received signal:', signal))
+  .on('SIGTERM', (signal) => console.log('Received signal;', signal))
+  .on('beforeExit', (code) => {
+    if (server.listening) server.close(() => process.exit(code));
+    else process.exit(code);
+
+    setTimeout(() => process.exit(code), 500).unref();
+  });
+
+server.listen(process.env.PORT || 7070, () => {
+  console.log(`🚀 Server ready at: http://localhost:${process.env.PORT || 7070}`);
+});

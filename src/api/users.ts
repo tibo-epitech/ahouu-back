@@ -8,21 +8,23 @@ import { NextFunction, Request, Response } from 'express';
 
 import mime from '../mime';
 import fbworker, { storage } from '../dbWorker';
-import { User, UserResponse } from '../types';
-import { EmailRegEx, getUserFromRequest, PasswordRegEx } from '../utils';
+import { UserResponse, UserUpdateBody } from '../types';
+import {
+  EmailRegEx, getUserFromRequest, Hash, PasswordRegEx,
+} from '../utils';
 
 // eslint-disable-next-line import/prefer-default-export
 export const update = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<Response<{ user: User }>> => {
+): Promise<Response<{ user: UserResponse }>> => {
   const current = await getUserFromRequest(req, next);
   if (!current) return res;
 
   if (isEmpty(req.body)) return res.status(400).send({ message: 'users/invalid-body' });
 
-  const body = req.body as { email: string, password: string, username: string };
+  const body = req.body as UserUpdateBody;
   const { email, password, username } = body;
 
   if (!isEmpty(email)) {
@@ -43,7 +45,7 @@ export const update = async (
   if (!isEmpty(password)) {
     if (!PasswordRegEx.test(password)) return res.status(400).send({ message: 'users/invalid-password' });
 
-    current.password = CryptoJS.MD5(password).toString();
+    current.password = Hash(password);
   }
 
   if (!isEmpty(username)) {

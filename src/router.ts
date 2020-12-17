@@ -1,15 +1,23 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
+
 import * as auth from './api/auth';
 import * as users from './api/users';
-import authorization from './authorization';
+import * as rooms from './api/rooms';
+import { authed, unauthed } from './authorization';
 
 const router = express.Router();
 
-const open = (req: Request, res: Response, next: NextFunction) => next();
+/**
+ * Public
+ */
+router.post('/login', unauthed, auth.login);
+router.post('/verify', unauthed, auth.verify);
+router.post('/register', unauthed, auth.register);
 
-router.post('/login', open, auth.login);
-router.post('/verify', open, auth.verify);
-router.post('/register', open, auth.register);
-router.post('/users/update', authorization, users.update);
+/**
+ * Private
+ */
+router.post('/users/update', authed, users.update);
+router.post('/rooms/create', authed, rooms.create);
 
 export default router;
