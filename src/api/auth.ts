@@ -75,7 +75,7 @@ export const register = async (
     const ext = mime[picture.mimetype];
     const path = `users/${userID}/picture.${ext}`;
 
-    const buffer = picture?.data;
+    const buffer = picture.data;
     const optimized = await imagemin.buffer(buffer, {
       plugins: [
         JpegTran(),
