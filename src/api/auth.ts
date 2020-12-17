@@ -84,7 +84,7 @@ export const register = async (
     });
 
     const file = storage.file(path);
-    await file.save(optimized, { public: true, contentType: picture?.mimetype });
+    await file.save(optimized, { public: true, contentType: picture.mimetype });
 
     data.picture = file.publicUrl();
   }

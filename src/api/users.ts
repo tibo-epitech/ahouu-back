@@ -67,7 +67,7 @@ export const update = async (
     const ext = mime[picture.mimetype];
     const path = `users/${current.id}/picture.${ext}`;
 
-    const buffer = picture?.data;
+    const buffer = picture.data;
     const optimized = await imagemin.buffer(buffer, {
       plugins: [
         JpegTran(),
@@ -76,7 +76,7 @@ export const update = async (
     });
 
     const file = storage.file(path);
-    await file.save(optimized, { public: true, contentType: picture?.mimetype });
+    await file.save(optimized, { public: true, contentType: picture.mimetype });
 
     current.picture = file.publicUrl();
   }
