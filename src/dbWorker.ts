@@ -15,4 +15,5 @@ const fbworker : Record<Collections, FirebaseFirestore.CollectionReference> = {
 };
 
 export const storage = adminDb.storage().bucket();
+export const fieldValue = adminDb.firestore.FieldValue;
 export default fbworker;

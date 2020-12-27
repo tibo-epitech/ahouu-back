@@ -5,7 +5,7 @@ module.exports.up = () => {
     fbworker.users.doc('userID=MD5').set({
         email: 'user@email',
         username: 'username',
-        id: 'md5 of user meail',
+        id: 'md5 of user email',
         password: 'md5 of user password',
     }).then(() => {
         console.log('users collection has been created');
