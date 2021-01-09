@@ -366,7 +366,7 @@ async function onSeerVote({ auth: { room }, emit }: SocketContext, vote: string)
   emit('wolfs-wakes-up', data);
 }
 
-async function villageAwakes({ auth: { room, user }, emit }: SocketContext) {
+async function villageAwakes({ auth: { room }, emit }: SocketContext) {
   const snap = await fbworker.rooms.doc(room.id).get();
   const data = snap.data() as Room;
 
@@ -477,7 +477,7 @@ async function onWolfVote(context: SocketContext, vote: string) {
 }
 
 async function onWitchVote(context: SocketContext, vote: string) {
-  const { auth: { room, user }, emit } = context;
+  const { auth: { room }, emit } = context;
 
   const snap = await fbworker.rooms.doc(room.id).get();
   const data = snap.data() as Room;
