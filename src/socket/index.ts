@@ -371,7 +371,7 @@ async function villageAwakes({ auth: { room, user }, emit }: SocketContext) {
   const data = snap.data() as Room;
 
   if (data.votes.witch) data.votes.villagers.witch = data.votes.witch;
-  const res = countVotes(data.votes.villagers) as string;
+  const res = countVotes(data.votes.villagers);
 
   data.adminTurn = 'vote';
   data.votes.witch = undefined;
