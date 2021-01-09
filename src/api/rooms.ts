@@ -1,21 +1,17 @@
-import omit from 'lodash.omit';
-import isEmpty from 'lodash.isempty';
 import { NextFunction, Request, Response } from 'express';
+import isEmpty from 'lodash.isempty';
+import omit from 'lodash.omit';
 
 import fbworker from '../dbWorker';
 import {
-  GenerateRandomID, getUserFromRequest, Hash, PasswordRegEx,
-} from '../utils';
-import {
-  Room,
-  RoomCreateBody,
-  PlayerRole,
-  PlayerState,
+  Room, RoomCreateBody, RoomGetManyBody, RoomGetOneBody, RoomResponse,
   RoomState,
-  RoomResponse,
 } from '../types';
 
-// eslint-disable-next-line import/prefer-default-export
+import {
+  GenerateRandomID, GenerateRoomName, getUserFromRequest, Hash, PasswordRegEx,
+} from '../utils';
+
 export const create = async (
   req: Request,
   res: Response,
@@ -24,24 +20,22 @@ export const create = async (
   const current = await getUserFromRequest(req, next);
   if (!current) return res;
 
-  if (isEmpty(req.body)) return res.status(400).send({ message: 'rooms/invalid-body' });
-
   const body = req.body as RoomCreateBody;
-  const { name, max, password } = body;
+  const { name = GenerateRoomName(), max = 8, password } = body;
 
   const data: Room = {
     id: GenerateRandomID(),
-    admin: current.id,
-    name: name.trim(),
+    admin: current.username,
+    name,
     max,
-    players: [{
-      userId: current.id,
-      role: PlayerRole.NONE,
-      state: PlayerState.WAITING_IN_LOBBY,
-    }],
+    players: [],
     state: RoomState.LOBBY,
-    messages: [],
     private: !!password,
+    adminTurn: 'none',
+    votes: {
+      wolfs: {},
+      villagers: {},
+    },
   };
 
   if (!max || max < 6 || max > 12) return res.status(400).send({ message: 'rooms/invalid-max' });
@@ -52,11 +46,48 @@ export const create = async (
     data.password = Hash(password);
   }
 
-  const query = await fbworker.rooms.where('name', '==', data.name).get();
-  if (!query.empty) return res.status(400).send({ message: 'rooms/name-already-in-use' });
-
   await fbworker.rooms.doc(data.id).set(data);
 
   const room: RoomResponse = omit(data, 'password');
   return res.status(201).send({ room });
+};
+
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response<{ room: RoomResponse }>> => {
+  const current = await getUserFromRequest(req, next);
+  if (!current) return res;
+
+  if (isEmpty(req.body)) return res.status(400).send({ message: 'rooms/invalid-body' });
+
+  const body = req.body as RoomGetOneBody;
+  const { id } = body;
+
+  const snap = await fbworker.rooms.doc(id).get();
+  if (!snap.exists) return res.status(400).send({ message: 'rooms/room-not-found' });
+
+  const data = snap.data() as Room;
+
+  const room: RoomResponse = omit(data, 'password');
+  return res.status(201).send({ room });
+};
+
+export const getMany = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response<{ room: RoomResponse }>> => {
+  const current = await getUserFromRequest(req, next);
+  if (!current) return res;
+
+  const body = req.body as RoomGetManyBody;
+  const { limit = 20, page = 1 } = body;
+
+  const query = await fbworker.rooms.get();
+  const list = query.docs.map((snap) => omit(snap.data() as Room, 'password'));
+
+  const rooms = list.splice(limit * (page - 1), limit * page);
+  return res.status(201).send({ rooms });
 };

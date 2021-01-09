@@ -1,13 +1,18 @@
 export type Room = {
   id: string
-  admin: string
+  admin?: string
   name: string
-  max: number // min by default 6
+  max: number
   players: Player[]
   state: RoomState
-  messages: Message[] // transfer message on rematch
   private: boolean
-  password?: string // hash
+  password?: string
+  adminTurn: 'sleep' |'vote' | 'init' | 'none'
+  votes: {
+    wolfs: Record<string, string>
+    witch?: string
+    villagers: Record<string, string>
+  }
 };
 
 export enum RoomState {
@@ -17,10 +22,13 @@ export enum RoomState {
 }
 
 export type Player = {
-  userId: string // TODO: exists and unique in the room
-  role: PlayerRole // TODO: unique in the room
+  username: string
+  picture?: string
+  role: PlayerRole
   state: PlayerState
-  won?: boolean
+  messages: Message[]
+  connected: boolean
+  potion?: boolean
 };
 
 export enum PlayerState {
@@ -29,6 +37,8 @@ export enum PlayerState {
   SLEEPING = 'sleeping',
   ROLE_BASED_ACTION = 'role-base-action',
   DEAD = 'dead',
+  WINNER = 'winner',
+  LOOSER = 'looser',
 }
 
 export enum PlayerRole {
@@ -40,41 +50,84 @@ export enum PlayerRole {
 }
 
 export type Message = {
+  id: string
   type: MessageType
   username?: string
-  timestamp: number
+  timestamp?: number
+  payload?: Record<string, string>
   content: string
 };
 
 export enum MessageType {
-  GENERALE = 'none', // TODO: GENERALE allowed only while awake
-  WOLF = 'none',
-  EVENT = 'event', // TODO: system events -> trad from lang
+  GENERAL = 'general',
+  WOLF = 'wolf',
+  SYSTEM_GENERAL = 'system-general',
+  SYSTEM_SELF = 'system-self',
+  SYSTEM_WOLF = 'system-wolf',
 }
 
 export type RoomResponse = Omit<Room, 'password'>;
 export type RoomCreateBody = Pick<Room, 'name' | 'max' | 'password'>;
+export type RoomGetOneBody = { id: string };
+export type RoomGetManyBody = { limit?: number, page?: number };
 
-export enum RoomEventsAction {
-  JOIN = 'join',
-  KICK_USER = 'kick-user',
-  LEAVE = 'leave',
-  SEND_MESSAGE = 'send-message',
-  START = 'start',
-  SEND_VOTE = 'send-vote',
-  PERFORM_ROLE_BASED_ACTION = 'perform-role-based-action',
+export enum MessageEvents {
+  INITIAL_ADMIN = 'initial-admin',
+  NUMBER_OF_WOLFS = 'number-of-wolfs',
+  WAITING_FOR_INITIAL_ACTION = 'waiting-for-initial-action',
+  ADMIN_START_GAME = 'admin-start-game',
+  ADMIN_LAUNCH_VOTES = 'admin-launch-votes',
+  NEW_ADMIN = 'new-admin',
+  VILLAGE_SLEEPING = 'village-sleeping',
+  VILLAGE_WAKES_UP = 'village-wakes-up',
+  SEER_WAKES_UP = 'seer-wakes-up',
+  SEER_SELECT_CHOICE = 'seer-select-choice',
+  SEER_RESULT = 'seer-result',
+  SEER_SLEEPS = 'seer-sleeps',
+  WOLFS_WAKES_UP = 'wolfs-wakes-up',
+  WOLFS_SELECT_CHOICE = 'wolfs-select-choice',
+  WOLF_SLEEPS = 'wolf-sleeps',
+  WITCH_WAKES_UP = 'witch-wakes-up',
+  WITCH_SELECT_CHOICE = 'witch-select-choice',
+  WITCH_SLEEPS = 'witch-sleeps',
+  PLAYER_DIED = 'player-died',
+  WOLF_WIN = 'wolf-win',
+  VILLAGE_WIN = 'village-win',
 }
 
-export enum RoomEventsListener {
-  USER_JOINED = 'user-joined',
-  USER_LEAVED = 'user-leaved',
-  USER_KICKED = 'user-kicked',
-  NEW_MESSAGE = 'new-message',
-  GAME_STARTED = 'game-started', // receive roles
-  VILLAGE_SLEEPS = 'village-sleeps',
-  VILLAGE_AWAKES = 'village-awakes',
-  VILLAGE_VOTE = 'village-vote',
-  ROLE_BASED_AWAKE = 'role-based-awake',
-  ROLE_BASED_ACTION_RESULT = 'role-based-action-result',
-  GAME_ENDED = 'game-ended', // with result / close room / allow create new room from this one
-}
+export type RoomEvents =
+  'connect' |
+  'disconnect' |
+  'connect_error' |
+  'admin-change' |
+  'user-kicked' |
+  'user-joined' |
+  'user-leaved' |
+  'new-message' |
+  'game-started' |
+  'your-turn' |
+  'village-sleeps' |
+  'village-awakes' |
+  'village-vote' |
+  'seer-wakes-up' |
+  'seer-sleeps' |
+  'wolfs-wakes-up' |
+  'wolfs-sleeps' |
+  'witch-wakes-up' |
+  'witch-sleeps' |
+  'game-ended';
+
+export type RoomTurn =
+  'put-to-sleep' |
+  'launch-vote';
+
+export type RoomActions =
+  'kick-user' |
+  'send-message' |
+  'game-start' |
+  'seer-vote' |
+  'wolf-vote' |
+  'witch-vote' |
+  'put-village-to-sleep' |
+  'user-vote' |
+  'disconnecting';

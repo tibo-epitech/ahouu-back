@@ -3,6 +3,9 @@ import cryptoJS from 'crypto-js';
 import { NextFunction, Request } from 'express';
 import { UnauthorizedError } from 'express-jwt';
 
+import {
+  uniqueNamesGenerator, adjectives, animals, colors, countries, names,
+} from 'unique-names-generator';
 import db from './dbWorker';
 import { User } from './types';
 
@@ -31,3 +34,9 @@ export const getUserFromRequest = async (
 
 export const GenerateRandomID = (): string => crypto.randomBytes(16).toString('hex');
 export const Hash = (password: string): string => cryptoJS.MD5(password).toString();
+
+export const GenerateRoomName = (): string => uniqueNamesGenerator({
+  dictionaries: [adjectives, animals, colors, countries, names],
+  separator: '-',
+  length: 3,
+});

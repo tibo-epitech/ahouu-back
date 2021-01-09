@@ -9,6 +9,8 @@ adminDb.initializeApp({
 });
 
 const db = adminDb.firestore();
+db.settings({ ignoreUndefinedProperties: true });
+
 const fbworker : Record<Collections, FirebaseFirestore.CollectionReference> = {
   users: db.collection('users'),
   rooms: db.collection('rooms'),
