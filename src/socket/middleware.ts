@@ -34,15 +34,6 @@ export default function SocketMiddleware(
     .then(() => { socket.handshake.auth = auth; })
     .then(() => next())
     .catch((e: Error) => {
-      if (auth.user && auth.room) {
-        auth.room.players = auth.room.players.filter((p) => p.username !== auth.user?.username);
-        fbworker.rooms
-          .doc(query.roomId)
-          .set(auth.room)
-          .then(() => undefined)
-          .catch(() => undefined);
-      }
-
       if (e.message === 'socket/invalid-token' || e.message === 'socket/room-not-found') next(e);
       else next(new Error('socket/generic-error'));
     });
