@@ -35,7 +35,7 @@ export const randomisePlayerRoles = (players: Player[]): Array<PlayerRole> => {
   return roles;
 };
 
-export const countVotes = (record: Record<string, string>): string | undefined => {
+export const countVotes = (record: Record<string, string>): string => {
   const votes = Object.values(record);
 
   let mf = 1;
@@ -52,5 +52,5 @@ export const countVotes = (record: Record<string, string>): string | undefined =
     m = 0;
   }
 
-  return item;
+  return item as string;
 };
