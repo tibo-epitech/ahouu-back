@@ -1,14 +1,15 @@
-// import socket from 'socket.io';
-import http from 'http';
 import cors from 'cors';
-import fileUpload from 'express-fileupload';
 import express, { NextFunction, Request, Response } from 'express';
+import fileUpload from 'express-fileupload';
+import http from 'http';
 
 import router from './router';
+import io from './socket';
 
 const app = express();
 const server = http.createServer(app);
-// const io = new socket.Server(server);
+
+io(server);
 
 app.use(cors());
 app.use(fileUpload({ parseNested: true }));

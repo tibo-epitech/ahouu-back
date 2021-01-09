@@ -9,8 +9,6 @@ process
   .on('beforeExit', (code) => {
     if (server.listening) server.close(() => process.exit(code));
     else process.exit(code);
-
-    setTimeout(() => process.exit(code), 500).unref();
   });
 
 server.listen(process.env.PORT || 7070, () => {
