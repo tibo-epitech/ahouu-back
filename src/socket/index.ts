@@ -206,7 +206,6 @@ async function onDisconnecting({
 
     await snap.ref.set(data);
 
-    console.log('on player leaved game', user.username, data.players.map((p) => p.username));
     emit('user-leaved', data.players);
     if (adminChange) {
       emit('admin-change', data.admin);
@@ -529,8 +528,6 @@ async function onUserVote(context: SocketContext, vote: string) {
   const wolf = alive.every((player) => player.role === PlayerRole.WOLF);
   const village = alive.every((player) => player.role !== PlayerRole.WOLF);
 
-  console.log('wolf', wolf);
-  console.log('village', village);
   if (wolf || village) {
     room.state = RoomState.FINISHED;
     room.players = room.players.map((player) => {
