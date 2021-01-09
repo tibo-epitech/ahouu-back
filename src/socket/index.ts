@@ -311,7 +311,7 @@ async function onPutVillageToSleep({ auth: { room, user }, emit }: SocketContext
   }
 }
 
-async function onSeerVote({ auth: { room, user }, emit }: SocketContext, vote: string) {
+async function onSeerVote({ auth: { room }, emit }: SocketContext, vote: string) {
   const snap = await fbworker.rooms.doc(room.id).get();
   const data = snap.data() as Room;
 
@@ -603,6 +603,7 @@ export default (server: http.Server): Server => {
         context.on('kick-user', (username: string) => onKickUser(context, username));
         context.on('disconnecting', () => onDisconnecting(context));
       })
+      // eslint-disable-next-line no-console
       .catch((e) => console.error(e));
   });
 
