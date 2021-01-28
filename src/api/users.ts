@@ -6,7 +6,6 @@ import PngQuant from 'imagemin-pngquant';
 import { UploadedFile } from 'express-fileupload';
 import { NextFunction, Request, Response } from 'express';
 
-import mime from '../mime';
 import fbworker, { storage } from '../dbWorker';
 import { UserResponse, UserUpdateBody } from '../types';
 import {
@@ -22,10 +21,8 @@ export const update = async (
   const current = await getUserFromRequest(req, next);
   if (!current) return res;
 
-  if (isEmpty(req.body)) return res.status(400).send({ message: 'users/invalid-body' });
-
   const body = req.body as UserUpdateBody;
-  const { email, password, username } = body;
+  const { email, password, username } = body || {};
 
   if (!isEmpty(email)) {
     const trimed = email.trim();
@@ -64,8 +61,7 @@ export const update = async (
   if (!isEmpty(req.files)) {
     const { picture } = req.files as { picture: UploadedFile };
 
-    const ext = mime[picture.mimetype];
-    const path = `users/${current.id}/picture.${ext}`;
+    const path = `users/${current.id}/${picture.name}`;
 
     const buffer = picture.data;
     const optimized = await imagemin.buffer(buffer, {

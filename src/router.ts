@@ -19,6 +19,7 @@ router.post('/register', unauthed, auth.register);
  */
 router.post('/users/update', authed, users.update);
 router.post('/rooms/create', authed, rooms.create);
+router.post('/rooms/join', authed, rooms.join);
 router.post('/rooms/get-one', authed, rooms.getOne);
 router.post('/rooms/get-many', authed, rooms.getMany);
 

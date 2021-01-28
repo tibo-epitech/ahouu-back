@@ -38,7 +38,10 @@ export const create = async (
     },
   };
 
-  if (!max || max < 6 || max > 12) return res.status(400).send({ message: 'rooms/invalid-max' });
+  const query = await fbworker.rooms.where('name', '==', data.name).get();
+  if (!query.empty) return res.status(400).send({ message: 'rooms/room-name-already-in-use' });
+
+  if (!max || max < 4 || max > 12) return res.status(400).send({ message: 'rooms/invalid-max' });
 
   if (password) {
     if (!PasswordRegEx.test(password)) return res.status(400).send({ message: 'rooms/invalid-password' });
@@ -50,6 +53,30 @@ export const create = async (
 
   const room: RoomResponse = omit(data, 'password');
   return res.status(201).send({ room });
+};
+
+export const join = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response<{ room: RoomResponse }>> => {
+  const current = await getUserFromRequest(req, next);
+  if (!current) return res;
+
+  if (isEmpty(req.body)) return res.status(400).send({ message: 'rooms/invalid-body' });
+
+  const body = req.body as { id: string, password: string };
+  const { id, password } = body;
+
+  const snap = await fbworker.rooms.doc(id).get();
+  if (!snap.exists) return res.status(400).send({ message: 'rooms/room-not-found' });
+
+  const hash = Hash(password);
+  const room = snap.data() as Room;
+
+  if (!room.password || room.password !== hash) return res.status(400).send({ message: 'rooms/invalid-password' });
+
+  return res.status(201).send({ valid: true });
 };
 
 export const getOne = async (
@@ -82,12 +109,8 @@ export const getMany = async (
   const current = await getUserFromRequest(req, next);
   if (!current) return res;
 
-  const body = req.body as RoomGetManyBody;
-  const { limit = 20, page = 1 } = body;
-
   const query = await fbworker.rooms.get();
-  const list = query.docs.map((snap) => omit(snap.data() as Room, 'password'));
+  const rooms = query.docs.map((snap) => omit(snap.data() as Room, 'password'));
 
-  const rooms = list.splice(limit * (page - 1), limit * page);
   return res.status(201).send({ rooms });
 };

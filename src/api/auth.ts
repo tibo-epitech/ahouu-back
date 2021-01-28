@@ -7,7 +7,6 @@ import { UploadedFile } from 'express-fileupload';
 import { Request, Response } from 'express';
 import axios, { AxiosRequestConfig } from 'axios';
 
-import mime from '../mime';
 import { authed } from '../authorization';
 import fbworker, { storage } from '../dbWorker';
 import { EmailRegEx, Hash, PasswordRegEx } from '../utils';
@@ -72,8 +71,7 @@ export const register = async (
   if (!isEmpty(req.files)) {
     const { picture } = req.files as { picture: UploadedFile };
 
-    const ext = mime[picture.mimetype];
-    const path = `users/${userID}/picture.${ext}`;
+    const path = `users/${userID}/${picture.name}`;
 
     const buffer = picture.data;
     const optimized = await imagemin.buffer(buffer, {
@@ -102,16 +100,17 @@ export const login = async (
   if (isEmpty(req.body)) return res.status(400).send({ message: 'auth/invalid-body' });
 
   const body = req.body as UserSingInBody;
-  const { email, password } = body;
+  const { emailOrUsername, password } = body;
 
-  if (isEmpty(email)) return res.status(400).send({ message: 'auth/invalid-email' });
+  if (isEmpty(emailOrUsername)) return res.status(400).send({ message: 'auth/invalid-email' });
   if (isEmpty(password)) return res.status(400).send({ message: 'auth/invalid-password' });
 
-  const query = await fbworker.users.where('email', '==', email.trim()).get();
+  const q1 = await fbworker.users.where('email', '==', emailOrUsername.trim()).get();
+  const q2 = await fbworker.users.where('username', '==', emailOrUsername.trim()).get();
 
-  if (query.empty) return res.status(400).send({ message: 'auth/user-not-found' });
+  if (q1.empty && q2.empty) return res.status(400).send({ message: 'auth/user-not-found' });
 
-  const data = query.docs[0].data() as User;
+  const data = q1.empty ? q2.docs[0].data() as User : q1.docs[0].data() as User;
 
   const passwordToCompare = Hash(password);
 

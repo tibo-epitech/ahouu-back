@@ -17,7 +17,7 @@ export const getUserFromRequest = async (
   next: NextFunction,
 ): Promise<User | void> => {
   if (!req || !req.headers || !req.headers.authorization) {
-    const err = new UnauthorizedError('credentials_required', { message: 'Missing token' });
+    const err = new UnauthorizedError('credentials_required', { message: 'auth/invalid-token' });
     return next(err);
   }
 
@@ -25,7 +25,7 @@ export const getUserFromRequest = async (
   const snap = await db.users.where('token', '==', token).get();
 
   if (snap.empty) {
-    const err = new UnauthorizedError('invalid_token', { message: 'Token not found' });
+    const err = new UnauthorizedError('invalid_token', { message: 'auth/invalid-token' });
     return next(err);
   }
 
