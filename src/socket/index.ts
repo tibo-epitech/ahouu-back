@@ -97,6 +97,8 @@ async function onKickUser({ auth: { room, user }, emit }: SocketContext, usernam
 
   data.players = data.players.filter((p) => p.username !== username);
 
+  await snap.ref.set(data);
+
   emit('user-kicked', data.players);
 }
 
