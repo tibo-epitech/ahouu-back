@@ -35,22 +35,26 @@ export const randomisePlayerRoles = (players: Player[]): Array<PlayerRole> => {
   return roles;
 };
 
-export const countVotes = (record: Record<string, string>): string => {
-  const votes = Object.values(record);
+export const countVotes = (record: Record<string, string>, witch?: string) => {
+  const votes: Record<string, number> = {};
 
-  let mf = 1;
-  let m = 0;
-  let item;
-  for (let i = 0; i < votes.length; i++) {
-    for (let j = i; j < votes.length; j++) {
-      if (votes[i] === votes[j]) m++;
-      if (mf < m) {
-        mf = m;
-        item = votes[i];
-      }
+  Object.values(record).forEach((vote) => {
+    if (votes[vote]) votes[vote] += 1;
+    else votes[vote] = 1;
+  });
+
+  let max = 1;
+  let index = -1;
+  Object.values(votes).forEach((n, i) => {
+    if (n >= max) {
+      max = n;
+      index = i;
     }
-    m = 0;
-  }
+  });
 
-  return item as string;
+  const even = Object.values(votes).filter((n) => n === max).length > 1;
+  const name = Object.keys(votes)[index];
+  const res = witch && witch === name ? undefined : name;
+
+  return even ? undefined : res;
 };
